@@ -15,8 +15,27 @@ namespace CLandigGame
 
         //
         double altitude, speed, descend, ascend, hold;
+        double latitude, speedx, ax;
         bool engineOn = false;
+        bool enginexlOn = false;
+        bool enginexrOn = false;
         int score = 0;
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            hold = 1.0;
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            hold = 0.6;
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            hold = 0.3;
+        }
+
         System.Media.SoundPlayer player;
 
         /* private void EngineButton_MouseDown(object sender, MouseEventArgs e)
@@ -38,7 +57,14 @@ namespace CLandigGame
         {
             if (e.KeyData == Keys.Down)
             {
-                engineOn = false;
+                engineOn = true;
+            } else if (e.KeyData == Keys.Left)
+            {
+                enginexlOn = true;
+            }
+            else if (e.KeyData == Keys.Right)
+            {
+                enginexrOn = true;
             }
         }
 
@@ -46,7 +72,7 @@ namespace CLandigGame
         {
             if (e.KeyData == Keys.Down)
             {
-                engineOn = true;
+                engineOn = false;
             } else if (e.KeyData == Keys.Space)
             {
                 ShipPicBox.Image = Properties.Resources.Lander;
@@ -55,12 +81,22 @@ namespace CLandigGame
                 altitude = ShipPicBox.Height;
 
                 speed = 0.0;
+                speedx = 0.0;
                 score = 0;
                 engineOn = false;
+                enginexlOn = false;
+                enginexrOn = false;
                 StatusLabel.Text = "Score";
 
                 ShipMotion.Start();
+            } else if (e.KeyData == Keys.Left)
+            {
+                enginexlOn = false;
+            } else if (e.KeyData == Keys.Right)
+            {
+                enginexrOn = false;
             }
+            e.Handled = true;
         }
 
         //
@@ -69,14 +105,8 @@ namespace CLandigGame
         {
             descend = 0.03; // 下降
             ascend = 0.08; // 上昇
+            ax = 0.03;
             hold = 0.6; // 着陸速度許容値
-        }
-
-        private void StartButton_Click(object sender, EventArgs e)
-        {
-            
-
-
         }
 
 
@@ -91,10 +121,21 @@ namespace CLandigGame
             score++;
             speed += descend;
             altitude += speed;
+            latitude += speedx;
+            textBox1.Text = "↔"+altitude;
+            textBox2.Text = "↕" + latitude;
 
             if (engineOn)
             {
                 speed -= ascend;
+            }
+            if (enginexlOn)
+            {
+                speedx -= ax;
+            }
+            if (enginexrOn)
+            {
+
             }
 
             if (altitude >= ClientSize.Height)
@@ -107,7 +148,7 @@ namespace CLandigGame
                 }
                 else
                 {
-                    StatusLabel.Text = "You Gonna Fail, OK?";
+                    StatusLabel.Text = "Failed";
                     ShipPicBox.Image = Properties.Resources.Bombing;
 
                     player = new System.Media.SoundPlayer(Properties.Resources.explosion);
@@ -120,6 +161,7 @@ namespace CLandigGame
             
 
             ShipPicBox.Top = Convert.ToInt32(altitude) - ShipPicBox.Height;
+            ShipPicBox.Left = Convert.ToInt32(latitude) - ShipPicBox.Width;
         }
 
 
